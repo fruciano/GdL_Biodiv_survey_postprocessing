@@ -3,7 +3,7 @@ library(googlesheets4)
 gs4_deauth()
 # No need for authorization
 
-google_sheet_url="https://docs.google.com/spreadsheets/d/1YJ9dcTKNkQBSGoBdUDru2kwxBr5s_Klz-F4nFSJcieQ/"
+google_sheet_url=" "
 data=read_sheet(google_sheet_url)
 # Read in Google sheet data
 
