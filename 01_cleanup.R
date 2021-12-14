@@ -53,6 +53,7 @@ black_list=unlist(read.table(file="https://raw.githubusercontent.com/napolux/par
                       header = FALSE, stringsAsFactors = FALSE))
 # Import black list from repository
 
+NSFW_results=data.frame(flagged_excluded=NULL)
 
 flag_NSFW=apply(data, 1, FUN = function(x){
   x2=is.na(unlist(lapply(black_list, function(bdwrd){
@@ -62,6 +63,8 @@ flag_NSFW=apply(data, 1, FUN = function(x){
 flag_NSFW_bdwrd=apply(flag_NSFW, 2, which)
 
 if (length(flag_NSFW_bdwrd)>0){
+  
+  
 flag_NSFW_case=which(unlist(lapply(flag_NSFW_bdwrd, function(x) {
   k=NA
   if(length(x)>0){k=TRUE} else {k=FALSE}
