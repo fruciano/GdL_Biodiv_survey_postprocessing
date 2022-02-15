@@ -120,11 +120,56 @@ istituti_new=unlist(lapply(data$Istituto, function(x){
 
 data$Istituto=istituti_new
 
+##############################
+### Remove space from URLs ###
+##############################
+
+url_fields=which(colnames(data) %in%
+                         c("Sito", "Scholar", "ORCID", "ResearchGate"))
+
+for (j in seq(length(url_fields))){
+  data[,url_fields[j]]=gsub(" ", "", data[,url_fields[j]])
+}
+
 #######################
 ### Change all-caps ###
 #######################
 
-### THIS IS TO DO - SIGNPOST FOR LATER
+library(tools)
+free_text_fields=which(colnames(data) %in%
+                         c("Email","Cognome", "Nome",
+                           "Area_di_ricerca", "Research_area",
+                           "Tecniche", "Techniques",
+                           "Sito", "Scholar", "ORCID", "ResearchGate"))
+
+for (j in seq(length(free_text_fields))){
+  tmp_all_caps_idx=which(unlist(lapply(data[,free_text_fields[j]], function(s)
+    s==toupper(s))))
+  if (length(tmp_all_caps_idx)>0){
+  data[tmp_all_caps_idx,free_text_fields[j]]=toTitleCase(
+    tolower(data[tmp_all_caps_idx,free_text_fields[j]])
+  )
+  }
+}
+
+#############################################
+### Change name and surname all lowercase ###
+#############################################
+
+nome_cognome_cols=which(colnames(data) %in% c("Nome", "Cognome"))
+
+for (j in seq(length(nome_cognome_cols))){
+  tmp_lw_caps_idx=which(unlist(lapply(data[,nome_cognome_cols[j]], function(s)
+    s==tolower(s))))
+  if (length(tmp_all_caps_idx)>0){
+    data[tmp_lw_caps_idx,nome_cognome_cols[j]]=toTitleCase(
+      data[tmp_lw_caps_idx,nome_cognome_cols[j]]
+    )
+  }
+}
+
+########################
+### TO DO - check that ORCID and similar are well-formed
 
 
 ##########################
