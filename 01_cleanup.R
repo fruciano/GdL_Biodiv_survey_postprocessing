@@ -52,6 +52,13 @@ data=as.data.frame(sapply(data, function(x) gsub("\"", "", x)))
 black_list=unlist(read.table(file="https://raw.githubusercontent.com/napolux/paroleitaliane/master/paroleitaliane/lista_badwords.txt",
                       header = FALSE, stringsAsFactors = FALSE))
 # Import black list from repository
+black_list=gsub("fica", " fica", black_list)
+# Don't consider "fica" if not preceded by space, as it's often in relevant names (es., "geografica")
+black_list=gsub("tette", " tette", black_list)
+# Same for "tette" (es., "Aree protette")
+black_list=gsub("mona", " mona", black_list)
+# Same for "mona" (es., "Simona")
+
 
 NSFW_results=data.frame(flagged_excluded=NULL)
 
@@ -96,6 +103,28 @@ if (length(NSFW_results$flagged_excluded)>0) {
 data=data[-flag_NSFW2,]
 }
 # Actual removal of flagged items from dataset
+
+###################################
+###   Modifying the institute   ###
+### to have a consistent style  ###
+###################################
+
+sigle_istituti=read.xlsx("sigle_istituti.xlsx", sheetIndex = 1)
+
+istituti_new=unlist(lapply(data$Istituto, function(x){
+  best_match=which(unlist(lapply(sigle_istituti$Sigla, function(y){
+    length(grep(y, x, ignore.case = TRUE))>0
+  })))[1]
+  sigle_istituti$Sigla[best_match]
+}))
+
+data$Istituto=istituti_new
+
+#######################
+### Change all-caps ###
+#######################
+
+### THIS IS TO DO - SIGNPOST FOR LATER
 
 
 ##########################
