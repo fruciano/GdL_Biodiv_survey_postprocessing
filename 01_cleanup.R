@@ -156,17 +156,19 @@ for (j in seq(length(free_text_fields))){
 ### Change name and surname all lowercase ###
 #############################################
 
-nome_cognome_cols=which(colnames(data) %in% c("Nome", "Cognome"))
+nome_cognome_cols=which(colnames(data) %in% c("Cognome", "Nome"))
 
 for (j in seq(length(nome_cognome_cols))){
   tmp_lw_caps_idx=which(unlist(lapply(data[,nome_cognome_cols[j]], function(s)
     s==tolower(s))))
-  if (length(tmp_all_caps_idx)>0){
+  if (length(tmp_lw_caps_idx)>0){
     data[tmp_lw_caps_idx,nome_cognome_cols[j]]=toTitleCase(
       data[tmp_lw_caps_idx,nome_cognome_cols[j]]
     )
   }
 }
+
+
 
 ########################
 ### TO DO - check that ORCID and similar are well-formed
