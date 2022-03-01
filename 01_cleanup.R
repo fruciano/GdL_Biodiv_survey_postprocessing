@@ -216,6 +216,8 @@ for (j in seq(length(free_text_fields))){
   }
 }
 
+
+
 #############################################
 ### Change name and surname all lowercase ###
 #############################################

@@ -3,10 +3,12 @@ library(xlsx)
 data_new=readRDS("data_post_cleanup.RDS")
 # Import data
 
+
 col_exclude_names=c(colnames(data_new)[1:(grep("Cognome", colnames(data_new))-1)],
                       "Newsletter")
 data_for_shiny=data_new[,which((colnames(data_new) %in% col_exclude_names)==FALSE)]
 # Keep only the columns relevant for the public
+
 
 #####################
 ### Italian cols ####
