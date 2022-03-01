@@ -29,6 +29,8 @@ for (i in seq(nrow(biogeography_italian_translation))){
 data_for_shiny_IT$Biogeographic_area=biogeography_italian
 # Replace biogeographical areas by their Italian translations
 
+
+
 matrice=data_for_shiny_IT$Matrice
 matrice_split=strsplit(matrice, ",")
 matrice_split_ITonly=lapply(matrice_split, function(X){

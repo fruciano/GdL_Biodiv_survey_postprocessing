@@ -131,6 +131,70 @@ for (j in seq(length(url_fields))){
   data[,url_fields[j]]=gsub(" ", "", data[,url_fields[j]])
 }
 
+##########################################
+### Remove links without http or https ###
+##########################################
+
+for (fld in url_fields){
+  tmp_url_fld=data[,fld]
+  tmp_url_fld_valid_idx=union(grep("http://", tmp_url_fld),
+                              grep("https://", tmp_url_fld))
+  tmp_url_fld_to_NA=setdiff(seq(length(tmp_url_fld)), tmp_url_fld_valid_idx)
+  tmp_url_fld[tmp_url_fld_to_NA]=NA
+  data[,fld]=tmp_url_fld
+}
+
+############################
+### Fix malformed ORCIDs ###
+############################
+
+data$ORCID=gsub("my-orcid\\?orcid=", "", data$ORCID)
+# Some people by mistake put their login page
+
+######################################
+### Remove Scholar from websites   ###
+######################################
+
+data$Sito[grep("scholar", data$Sito)]=NA
+
+#########################
+### Fix Scholar links ###
+#########################
+
+non_scholar_scholar=setdiff(seq(length(data$Scholar)),
+                            grep("scholar", data$Scholar))
+data$Scholar[non_scholar_scholar]=NA
+# Remove links to pages which are not Scholar profiles
+
+non_profile_scholar=setdiff(seq(length(data$Scholar)),
+                            grep("ciations", data$Scholar))
+data$Scholar[non_profile_scholar]=NA
+# Remove links which do not contain "citations" in the URL
+# (usually these are simply Scholar searches)
+
+#################################
+###     Final "last resort"   ###
+### check that URL is working ###
+#################################
+
+library(httr)
+for (fld in url_fields){
+  for (i in seq(nrow(data))){
+  if (is.na(data[i,fld])==FALSE){
+    
+    tryCatch({
+      if(http_status(GET(data[i,fld],config = httr::config(connecttimeout = 20)
+      ))$category!="Success"){
+        data[i,fld]=NA 
+      } 
+    }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
+  }
+ }  
+}
+### Remember to use this only with good connection (lots of timeouts may
+### happen otherwise)
+
+
 #######################
 ### Change all-caps ###
 #######################
@@ -169,9 +233,6 @@ for (j in seq(length(nome_cognome_cols))){
 }
 
 
-
-########################
-### TO DO - check that ORCID and similar are well-formed
 
 
 ##########################
