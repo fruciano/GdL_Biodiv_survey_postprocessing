@@ -5,6 +5,7 @@ gs4_deauth()
 
 google_sheet_url=""
 
+
 data=read_sheet(google_sheet_url)
 # Read in Google sheet data
 
@@ -151,6 +152,20 @@ for (fld in url_fields){
 data$ORCID=gsub("my-orcid\\?orcid=", "", data$ORCID)
 # Some people by mistake put their login page
 
+orcid_w_search_idx=grep("search", data$ORCID)
+if (length(orcid_w_search_idx)>0){
+  for (i in seq(length(orcid_w_search_idx))){
+    tmp_orcid_str=data$ORCID[orcid_w_search_idx[i]]
+    if (length(grep("-", tmp_orcid_str)>0)){
+    tmp_orcid_str=strsplit(tmp_orcid_str, "=")[[1]]
+    tmp_orcid_str=tmp_orcid_str[length(tmp_orcid_str)]
+    new_tmp_orcid_str=paste0("https://orcid.org/", tmp_orcid_str)
+    data$ORCID[orcid_w_search_idx[i]]=new_tmp_orcid_str
+    }
+  }
+}
+# Some people insert the search for their own ORCID ID
+
 ######################################
 ### Remove Scholar from websites   ###
 ######################################
@@ -167,10 +182,21 @@ data$Scholar[non_scholar_scholar]=NA
 # Remove links to pages which are not Scholar profiles
 
 non_profile_scholar=setdiff(seq(length(data$Scholar)),
-                            grep("ciations", data$Scholar))
+                            grep("citations", data$Scholar))
 data$Scholar[non_profile_scholar]=NA
 # Remove links which do not contain "citations" in the URL
 # (usually these are simply Scholar searches)
+
+##############################
+### Fix ResearchGate links ###
+##############################
+
+non_RG_RG=setdiff(seq(length(data$ResearchGate)),
+                            grep("researchgate", data$ResearchGate))
+data$ResearchGate[non_RG_RG]=NA
+# Remove links to pages which are not ResearchGate profiles
+
+
 
 #################################
 ###     Final "last resort"   ###
@@ -216,7 +242,7 @@ for (j in seq(length(free_text_fields))){
   }
 }
 
-
+data[,free_text_fields]
 
 #############################################
 ### Change name and surname all lowercase ###
@@ -234,8 +260,29 @@ for (j in seq(length(nome_cognome_cols))){
   }
 }
 
+#######################################
+### Small changes to research areas ###
+###          and techniques         ###
+#######################################
 
+res_tech_fields=which(colnames(data) %in%
+                        c("Area_di_ricerca", "Research_area",
+                          "Tecniche", "Techniques"))
+for (fld in res_tech_fields){
+  data[,fld]=unlist(lapply(data[,fld], function(x){
+    paste(toupper(substring(x, 1, 1)),
+          tolower(substring(x, 2, nchar(x))),
+          sep = "")
+  }))
+}
+# Make sure that all the research areas and techniques fields
+# always start with an uppercase letter
 
+for (fld in res_tech_fields){
+  data[,fld]=gsub(";", ",", data[,fld])
+}
+# Change the ";" into "," so that when describing several fields,
+# always the same separator is used
 
 ##########################
 #### Final reordering ####

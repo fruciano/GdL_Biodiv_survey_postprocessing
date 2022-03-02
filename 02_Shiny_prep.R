@@ -14,9 +14,7 @@ data_for_shiny=data_new[,which((colnames(data_new) %in% col_exclude_names)==FALS
 ### Italian cols ####
 #####################
 
-col_exclude_it=c(grep("Research", colnames(data_for_shiny)),
-                 grep("Techniques", colnames(data_for_shiny))
-              )
+col_exclude_it=which(colnames(data_for_shiny) %in% c("Research_area", "Techniques"))
 data_for_shiny_IT=data_for_shiny[,-col_exclude_it]
 # Remove columns present in both the Italian and English version
 
